@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     num_classes = 100
 
-    transform = transforms.Compose(
+    transform_train = transforms.Compose(
         [
             transforms.RandomCrop(32, padding=4),
             transforms.RandomHorizontalFlip(),
@@ -35,10 +35,19 @@ if __name__ == "__main__":
         ]
     )
     trainset = torchvision.datasets.CIFAR100(
-        root="./data", train=True, download=True, transform=transform
+        root="./data", train=True, download=True, transform=transform_train
+    )
+    transform_test = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.5070751592371323, 0.48654887331495095, 0.4409178433670343],
+                std=[0.2673342858792401, 0.2564384629170883, 0.27615047132568404],
+            ),
+        ]
     )
     testset = torchvision.datasets.CIFAR100(
-        root="./data", train=False, download=True, transform=transform
+        root="./data", train=False, download=True, transform=transform_test
     )
 
     train_loader = DataLoader(trainset, batch_size=1024, shuffle=True)
@@ -60,7 +69,7 @@ if __name__ == "__main__":
         num_classes,
         criterion,
         optimizer,
-        num_epochs=2,
+        num_epochs=100,
         device=device,
     )
 
