@@ -26,19 +26,32 @@ if __name__ == "__main__":
 
     num_classes = 100
 
-    transform = transforms.Compose(
+    transform_train = transforms.Compose(
         [
-            # transforms.Resize(256),
-            # transforms.CenterCrop(224),
+            transforms.RandomCrop(32, padding=4, padding_mode="reflect"),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomRotation(15),
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            transforms.Normalize(
+                mean=[0.5071, 0.4865, 0.4409],
+                std=[0.2673, 0.2564, 0.2762],
+            ),
         ]
     )
     trainset = torchvision.datasets.CIFAR100(
-        root="./data", train=True, download=True, transform=transform
+        root="./data", train=True, download=True, transform=transform_train
+    )
+    transform_test = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.5071, 0.4865, 0.4409],
+                std=[0.2673, 0.2564, 0.2762],
+            ),
+        ]
     )
     testset = torchvision.datasets.CIFAR100(
-        root="./data", train=False, download=True, transform=transform
+        root="./data", train=False, download=True, transform=transform_test
     )
 
     # train_loader = DataLoader(trainset, batch_size=1024, shuffle=True)
@@ -49,7 +62,9 @@ if __name__ == "__main__":
     problem_name = "ResNet18"
     model.to(device)
 
-    model.load_state_dict(torch.load("models/resnet18_cifar100_adam_params.pt"))
+    model.load_state_dict(
+        torch.load("./models/resnet18_cifar100_adam_200steps_params.pt")
+    )
 
     params = get_model_params(model)
 
@@ -58,7 +73,7 @@ if __name__ == "__main__":
     gb_f = f1score_func(model, val_loader, num_classes, device)
     gb_test_f = f1score_func(model, test_loader, num_classes, device)
 
-    hist_file_path = f"out/nsga2_resnet18_cifar100"
+    hist_file_path = f"./out/nsga2_resnet18_cifar100"
 
     df = pd.DataFrame(
         {
@@ -90,11 +105,35 @@ if __name__ == "__main__":
     res = minimize(
         problem,
         algorithm,
-        ("n_gen", 3),
+        ("n_gen", 5),
         seed=1,
         verbose=True,
     )
 
-    df = pd.DataFrame({"B_max": res.X, "B_opt": res.F[:, 1], "B_opt": res.F[:, 0]})
+    arg_sorted = np.argsort(res.F[:, 1])
 
-    df.to_csv("./out/nsga2_resnet18_cifar100/paretofront.csv")
+    df = pd.DataFrame(
+        {
+            "B_max": res.X[arg_sorted, 0].astype(int),
+            "B_opt": res.F[arg_sorted, 1],
+            "B_opt F1 err": res.F[arg_sorted, 0],
+        }
+    )
+
+    df.to_csv("./out/nsga2_resnet18_cifar100/paretofront.csv", index=False)
+
+    plt.axhline(y=1 - gb_f, color="r", linestyle="-.", label="Baseline")
+    plt.plot(
+        df["B_opt"].to_numpy(),
+        1 - df["B_opt F1 err"].to_numpy(),
+        label="Pareto Frontier",
+        marker="o",
+        linestyle="--",
+    )
+
+    plt.grid()
+    plt.xlabel("Optimal blocked dimensions")
+    plt.ylabel("Optimal blocked F1-score")
+    plt.legend()
+
+    plt.savefig("./out/nsga2_resnet18_cifar100/paretofront.pdf")
