@@ -41,7 +41,7 @@ if __name__ == "__main__":
         root="./data", train=False, download=True, transform=transform
     )
 
-    train_loader = DataLoader(trainset, batch_size=256, shuffle=True)
+    # train_loader = DataLoader(trainset, batch_size=1024, shuffle=True)
     val_loader = DataLoader(testset, batch_size=1024, shuffle=False)
     test_loader = DataLoader(testset, batch_size=10000, shuffle=False)
 
