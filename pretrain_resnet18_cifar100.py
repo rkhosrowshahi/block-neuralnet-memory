@@ -24,13 +24,13 @@ if __name__ == "__main__":
 
     transform_train = transforms.Compose(
         [
-            transforms.RandomCrop(32, padding=4),
+            transforms.RandomCrop(32, padding=4, padding_mode="reflect"),
             transforms.RandomHorizontalFlip(),
             transforms.RandomRotation(15),
             transforms.ToTensor(),
             transforms.Normalize(
-                mean=[0.5070751592371323, 0.48654887331495095, 0.4409178433670343],
-                std=[0.2673342858792401, 0.2564384629170883, 0.27615047132568404],
+                mean=[0.5071, 0.4865, 0.4409],
+                std=[0.2673, 0.2564, 0.2762],
             ),
         ]
     )
@@ -41,8 +41,8 @@ if __name__ == "__main__":
         [
             transforms.ToTensor(),
             transforms.Normalize(
-                mean=[0.5070751592371323, 0.48654887331495095, 0.4409178433670343],
-                std=[0.2673342858792401, 0.2564384629170883, 0.27615047132568404],
+                mean=[0.5071, 0.4865, 0.4409],
+                std=[0.2673, 0.2564, 0.2762],
             ),
         ]
     )
@@ -59,8 +59,10 @@ if __name__ == "__main__":
     model.to(device)
 
     criterion = torch.nn.CrossEntropyLoss()
-    # optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
+    optimizer = torch.optim.SGD(
+        model.parameters(), lr=0.001, momentum=0.9, weight_decay=5e-4
+    )
+    # optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
 
     model, hist_dict = train(
         model,
@@ -73,7 +75,7 @@ if __name__ == "__main__":
         device=device,
     )
 
-    torch.save(model.state_dict(), "./models/resnet18_cifar100_adam_params.pt")
+    torch.save(model.state_dict(), "./models/resnet18_cifar100_sgd_params.pt")
 
     df = pd.DataFrame(hist_dict)
     df.to_csv("./out/resnet18_cifar100_adam_hist.csv")
