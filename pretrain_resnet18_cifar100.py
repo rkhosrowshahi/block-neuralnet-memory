@@ -59,10 +59,10 @@ if __name__ == "__main__":
     model.to(device)
 
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(
-        model.parameters(), lr=0.001, momentum=0.9, weight_decay=5e-4
-    )
-    # optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
+    # optimizer = torch.optim.SGD(
+    #     model.parameters(), lr=0.001, momentum=0.9, weight_decay=5e-4
+    # )
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
 
     model, hist_dict = train(
         model,
@@ -71,11 +71,11 @@ if __name__ == "__main__":
         num_classes,
         criterion,
         optimizer,
-        num_epochs=100,
+        num_epochs=200,
         device=device,
     )
 
-    torch.save(model.state_dict(), "./models/resnet18_cifar100_sgd_params.pt")
+    torch.save(model.state_dict(), "./models/resnet18_cifar100_adam_200steps_params.pt")
 
     df = pd.DataFrame(hist_dict)
-    df.to_csv("./out/resnet18_cifar100_sgd_hist.csv")
+    df.to_csv("./out/resnet18_cifar100_adam_200steps_hist.csv")
