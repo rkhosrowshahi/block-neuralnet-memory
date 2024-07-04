@@ -89,9 +89,21 @@ def train(
         epoch_loss.append(loss)
         epoch_acc.append(acc)
         epoch_top1.append(train_top1)
-        epoch_f1.append(train_f1.cpu().numpy())
+        epoch_f1.append(train_f1)
         epoch_test_top1.append(test_top1)
-        epoch_test_f1.append(test_f1.cpu().numpy())
+        epoch_test_f1.append(test_f1)
+
+        print(
+            {
+                "Iterations": np.arange(epoch + 1),
+                "train_loss": epoch_loss,
+                "train_acc": epoch_acc,
+                "train_top1": epoch_top1,
+                "train_f1": epoch_f1,
+                "test_top1": epoch_test_top1,
+                "test_f1": epoch_test_f1,
+            }
+        )
 
         print(
             f"Epoch {epoch}/{num_epochs} | train_loss: {loss:.6f} | train_acc: {acc:.6f} | train_top1: {train_top1:.6f} | train_f1: {train_f1:.6f} | test_top1: {test_top1:.6f} | test_f1: {test_f1:.6f}"

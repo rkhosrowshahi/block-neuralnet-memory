@@ -24,10 +24,14 @@ if __name__ == "__main__":
 
     transform = transforms.Compose(
         [
-            # transforms.Resize(256),
-            # transforms.CenterCrop(224),
+            transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomRotation(15),
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            transforms.Normalize(
+                mean=[0.5070751592371323, 0.48654887331495095, 0.4409178433670343],
+                std=[0.2673342858792401, 0.2564384629170883, 0.27615047132568404],
+            ),
         ]
     )
     trainset = torchvision.datasets.CIFAR100(
@@ -47,7 +51,7 @@ if __name__ == "__main__":
 
     criterion = torch.nn.CrossEntropyLoss()
     # optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
 
     model, hist_dict = train(
         model,
