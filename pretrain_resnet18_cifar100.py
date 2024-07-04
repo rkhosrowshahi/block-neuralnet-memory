@@ -78,4 +78,4 @@ if __name__ == "__main__":
     torch.save(model.state_dict(), "./models/resnet18_cifar100_sgd_params.pt")
 
     df = pd.DataFrame(hist_dict)
-    df.to_csv("./out/resnet18_cifar100_adam_hist.csv")
+    df.to_csv("./out/resnet18_cifar100_sgd_hist.csv")
