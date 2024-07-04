@@ -87,7 +87,7 @@ def train(
         test_top1, test_f1 = eval_model(model, test_loader, device, num_classes)
 
         epoch_loss.append(loss)
-        epoch_acc.append(acc.cpu().numpy())
+        epoch_acc.append(acc)
         epoch_top1.append(train_top1)
         epoch_f1.append(train_f1.cpu().numpy())
         epoch_test_top1.append(test_top1)
