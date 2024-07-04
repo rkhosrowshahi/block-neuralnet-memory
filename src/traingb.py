@@ -30,7 +30,9 @@ def train_step(model, data_loader, criterion, optimizer, device, num_classes=Non
         running_loss += loss.item()
         running_corrects += torch.sum(preds == labels.data) / inputs.size(0)
 
-    return running_loss / len(data_loader), running_corrects.double() / len(data_loader)
+    return running_loss / len(data_loader), running_corrects.double().item() / len(
+        data_loader
+    )
 
 
 def eval_model(model, data_loader, device, num_classes):
@@ -84,7 +86,7 @@ def train(
         train_top1, train_f1 = eval_model(model, train_loader, device, num_classes)
         test_top1, test_f1 = eval_model(model, test_loader, device, num_classes)
 
-        epoch_loss.append(loss.cpu().numpy())
+        epoch_loss.append(loss)
         epoch_acc.append(acc.cpu().numpy())
         epoch_top1.append(train_top1)
         epoch_f1.append(train_f1.cpu().numpy())
