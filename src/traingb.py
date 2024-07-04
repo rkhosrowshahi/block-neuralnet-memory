@@ -45,7 +45,7 @@ def eval_model(model, data_loader, device, num_classes):
             outputs = model(inputs)
 
             running_f1 += multiclass_f1_score(
-                outputs, labels, average="macro", num_classes=10
+                outputs, labels, average="macro", num_classes=num_classes
             ).item()
 
             running_top1 += top_k_accuracy_score(
