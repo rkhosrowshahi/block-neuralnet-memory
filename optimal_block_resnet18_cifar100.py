@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 import torchvision
 import torchvision.transforms as transforms
 from torchvision.models import resnet18
@@ -16,7 +16,7 @@ from pymoo.optimize import minimize
 
 
 if __name__ == "__main__":
-    os.makedirs("./out/nsga2_resnet18_cifar100/codebooks", exist_ok=True)
+    os.makedirs("./out/nsga2_resnet18_cifar100_200steps/codebooks", exist_ok=True)
 
     seed = 1
     torch.manual_seed(seed)
@@ -54,8 +54,22 @@ if __name__ == "__main__":
         root="./data", train=False, download=True, transform=transform_test
     )
 
-    # train_loader = DataLoader(trainset, batch_size=1024, shuffle=True)
-    val_loader = DataLoader(testset, batch_size=1024, shuffle=False)
+    num_samples = 1000
+    samples_per_class = num_samples // num_classes
+    if num_samples % num_classes > 0:
+        samples_per_class += 1
+    # Create an empty list to store the balanced dataset
+    balanced_indices = []
+    # Randomly select samples from each class for the training dataset
+    for i in range(num_classes):
+        class_indices = np.where(np.array(testset.targets) == i)[0]
+        selected_indices = np.random.choice(
+            class_indices, samples_per_class, replace=False
+        )
+        balanced_indices.extend(selected_indices)
+    # Create a subset of the original dataset using the balanced indices
+    balanced_dataset = Subset(testset, balanced_indices)
+    val_loader = DataLoader(balanced_dataset, batch_size=num_samples, shuffle=False)
     test_loader = DataLoader(testset, batch_size=10000, shuffle=False)
 
     model = resnet18(num_classes=num_classes)
@@ -73,7 +87,7 @@ if __name__ == "__main__":
     gb_f = f1score_func(model, val_loader, num_classes, device)
     gb_test_f = f1score_func(model, test_loader, num_classes, device)
 
-    hist_file_path = f"./out/nsga2_resnet18_cifar100"
+    hist_file_path = f"./out/nsga2_resnet18_cifar100_200steps"
 
     df = pd.DataFrame(
         {
@@ -98,14 +112,14 @@ if __name__ == "__main__":
         hist_file_path=hist_file_path,
     )
 
-    init_pop = np.random.randint(8, 256, (100, 1))
+    init_pop = np.column_stack([np.random.randint(16, 256, size=100) for k in range(1)])
 
     algorithm = NSGA2(pop_size=100, sampling=init_pop)
 
     res = minimize(
         problem,
         algorithm,
-        ("n_gen", 5),
+        ("n_gen", 3),
         seed=1,
         verbose=True,
     )
@@ -120,7 +134,7 @@ if __name__ == "__main__":
         }
     )
 
-    df.to_csv("./out/nsga2_resnet18_cifar100/paretofront.csv", index=False)
+    df.to_csv("./out/nsga2_resnet18_cifar100_200steps/paretofront.csv", index=False)
 
     plt.axhline(y=1 - gb_f, color="r", linestyle="-.", label="Baseline")
     plt.plot(
@@ -136,4 +150,4 @@ if __name__ == "__main__":
     plt.ylabel("Optimal blocked F1-score")
     plt.legend()
 
-    plt.savefig("./out/nsga2_resnet18_cifar100/paretofront.pdf")
+    plt.savefig("./out/nsga2_resnet18_cifar100_200steps/paretofront.pdf")

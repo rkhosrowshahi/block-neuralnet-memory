@@ -48,7 +48,7 @@ class MultiObjOptimalBlockOptimzationProblem(Problem):
         self,
         n_var=1,
         xl=10,
-        xu=1000,
+        xu=256,
         params=None,
         model=None,
         evaluation=None,

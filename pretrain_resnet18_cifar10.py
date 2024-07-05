@@ -65,7 +65,7 @@ if __name__ == "__main__":
         num_classes,
         criterion,
         optimizer,
-        num_epochs=100,
+        num_epochs=200,
         device=device,
     )
 
