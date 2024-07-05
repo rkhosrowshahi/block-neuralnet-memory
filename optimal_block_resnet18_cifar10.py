@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 import torchvision
 import torchvision.transforms as transforms
 from torchvision.models import resnet18
@@ -48,8 +48,22 @@ if __name__ == "__main__":
         root="./data", train=False, download=True, transform=transform_test
     )
 
-    # train_loader = DataLoader(trainset, batch_size=256, shuffle=True)
-    val_loader = DataLoader(testset, batch_size=256, shuffle=False)
+    num_samples = 100
+    samples_per_class = num_samples // num_classes
+    if num_samples % num_classes > 0:
+        samples_per_class += 1
+    # Create an empty list to store the balanced dataset
+    balanced_indices = []
+    # Randomly select samples from each class for the training dataset
+    for i in range(num_classes):
+        class_indices = np.where(np.array(testset.targets) == i)[0]
+        selected_indices = np.random.choice(
+            class_indices, samples_per_class, replace=False
+        )
+        balanced_indices.extend(selected_indices)
+    # Create a subset of the original dataset using the balanced indices
+    balanced_dataset = Subset(testset, balanced_indices)
+    val_loader = DataLoader(balanced_dataset, batch_size=num_samples, shuffle=False)
     test_loader = DataLoader(testset, batch_size=10000, shuffle=False)
 
     model = resnet18(num_classes=num_classes)
@@ -99,7 +113,7 @@ if __name__ == "__main__":
     res = minimize(
         problem,
         algorithm,
-        ("n_gen", 5),
+        ("n_gen", 3),
         seed=1,
         verbose=True,
     )

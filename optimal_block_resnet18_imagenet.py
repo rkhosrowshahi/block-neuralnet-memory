@@ -118,7 +118,7 @@ if __name__ == "__main__":
     res = minimize(
         problem,
         algorithm,
-        ("n_gen", 5),
+        ("n_gen", 3),
         seed=1,
         verbose=True,
     )
