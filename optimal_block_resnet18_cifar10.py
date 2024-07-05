@@ -94,7 +94,7 @@ if __name__ == "__main__":
 
     init_pop = np.column_stack([np.random.randint(16, 256, size=100) for k in range(1)])
 
-    algorithm = NSGA2(pop_size=100, sampling=init_pop)
+    algorithm = NSGA2(pop_size=100, sampling=init_pop, eliminate_duplicates=True)
 
     res = minimize(
         problem,
