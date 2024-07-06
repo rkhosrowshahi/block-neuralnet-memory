@@ -50,7 +50,7 @@ if __name__ == "__main__":
     val_loader = DataLoader(testset, batch_size=256, shuffle=False)
     test_loader = DataLoader(testset, batch_size=10000, shuffle=False)
 
-    model = vgg16(num_classes=num_classes, weights="DEFAULT")
+    model = vgg16(weights="DEFAULT")
     model.classifier[-1] = nn.Linear(4096, num_classes)
 
     problem_name = "vgg16"
