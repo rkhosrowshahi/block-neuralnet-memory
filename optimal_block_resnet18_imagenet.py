@@ -54,25 +54,29 @@ if __name__ == "__main__":
     )
     print(len(testset))
     # train_loader = DataLoader(trainset, batch_size=256, shuffle=True)
-    num_samples = 2000
+    num_samples, num_samples_test = 1000, 10000
     samples_per_class = num_samples // num_classes
     if num_samples % num_classes > 0:
         samples_per_class += 1
+    samples_per_class_test = num_samples_test // num_classes
+    if num_samples % num_classes > 0:
+        samples_per_class_test += 1
     # Create an empty list to store the balanced dataset
-    balanced_indices = []
+    balanced_indices, balanced_indices_test = [], []
     # Randomly select samples from each class for the training dataset
     for i in range(num_classes):
         class_indices = np.where(np.array(testset.targets) == i)[0]
         selected_indices = np.random.choice(
-            class_indices, samples_per_class, replace=False
+            class_indices, samples_per_class + samples_per_class_test, replace=False
         )
-        balanced_indices.extend(selected_indices)
-    print(len(balanced_indices))
+        balanced_indices.extend(selected_indices[:samples_per_class])
+        balanced_indices_test.extend(selected_indices[samples_per_class:])
     # Create a subset of the original dataset using the balanced indices
     balanced_dataset = Subset(testset, balanced_indices)
-    val_loader = DataLoader(balanced_dataset, batch_size=2000, shuffle=False)
+    val_loader = DataLoader(balanced_dataset, batch_size=num_samples, shuffle=False)
     print(len(val_loader))
-    test_loader = DataLoader(testset, batch_size=2000, shuffle=False)
+    balanced_dataset_test = Subset(testset, balanced_indices_test)
+    test_loader = DataLoader(balanced_dataset_test, batch_size=1024, shuffle=False)
     print(len(test_loader))
 
     model = resnet18(weights="DEFAULT")
@@ -84,7 +88,7 @@ if __name__ == "__main__":
     orig_dims = len(params)
 
     gb_f = f1score_func(model, val_loader, num_classes, device)
-    gb_test_f = f1score_func(model, test_loader, num_classes, device)
+    gb_test_f = f1score_func(model, test_loader, num_classes, device, mode="test")
 
     hist_file_path = f"./out/nsga2_resnet18_imagenet"
 
@@ -111,7 +115,12 @@ if __name__ == "__main__":
         hist_file_path=hist_file_path,
     )
 
-    init_pop = np.column_stack([np.random.randint(16, 256, size=100) for k in range(1)])
+    init_pop = np.column_stack(
+        [np.linspace(8, 1024 - 1, 100, dtype=int) for k in range(1)]
+    )
+    # print(init_pop)
+    # init_pop[0] = [473]
+    # init_pop[1] = [30]
 
     algorithm = NSGA2(pop_size=100, sampling=init_pop, eliminate_duplicates=True)
 
