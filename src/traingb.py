@@ -102,7 +102,7 @@ def train(
             break
 
         if epoch % 100 == 99:
-            torch.save(model.state_dict(), f"{path}_{epoch}steps_params.pt")
+            torch.save(model.state_dict(), f"{path}_{epoch+1}steps_params.pt")
 
     hist_dict = {
         "Iterations": range(epoch + 1),
