@@ -5,7 +5,7 @@ import torch
 from torch.utils.data import DataLoader
 import torchvision
 import torchvision.transforms as transforms
-from torchvision.models import vgg16
+from torchvision.models import wide_resnet101_2
 
 from src.traingb import train
 
@@ -48,8 +48,8 @@ if __name__ == "__main__":
     val_loader = DataLoader(testset, batch_size=256, shuffle=False)
     test_loader = DataLoader(testset, batch_size=10000, shuffle=False)
 
-    model = vgg16(num_classes=num_classes, weights="IMAGENET1K_FEATURES")
-    problem_name = "vgg16"
+    model = wide_resnet101_2(num_classes=num_classes)
+    problem_name = "wresnet"
     model.to(device)
 
     criterion = torch.nn.CrossEntropyLoss()
@@ -67,10 +67,12 @@ if __name__ == "__main__":
         optimizer,
         num_epochs=1000,
         device=device,
-        path="./models/vgg16_cifar10_adam",
+        path="./models/wideresnet101_cifar10_adam",
     )
 
-    torch.save(model.state_dict(), "./models/vgg16_cifar10_adam_1000steps_params.pt")
+    torch.save(
+        model.state_dict(), "./models/wideresnet101_cifar10_adam_1000steps_params.pt"
+    )
 
     df = pd.DataFrame(hist_dict)
-    df.to_csv("./out/vgg16_cifar10_adam_1000steps_hist.csv")
+    df.to_csv("./out/wideresnet101_cifar10_adam_1000steps_hist.csv")
