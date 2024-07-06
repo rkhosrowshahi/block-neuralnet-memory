@@ -7,6 +7,8 @@ import torchvision
 import torchvision.transforms as transforms
 from torchvision.models import vgg16
 
+import torch.nn as nn
+
 from src.traingb import train
 
 
@@ -48,7 +50,9 @@ if __name__ == "__main__":
     val_loader = DataLoader(testset, batch_size=256, shuffle=False)
     test_loader = DataLoader(testset, batch_size=10000, shuffle=False)
 
-    model = vgg16(num_classes=num_classes)
+    model = vgg16(num_classes=num_classes, weights="DEFAULT")
+    model.classifier[-1] = nn.Linear(4096, num_classes)
+
     problem_name = "vgg16"
     model.to(device)
 
