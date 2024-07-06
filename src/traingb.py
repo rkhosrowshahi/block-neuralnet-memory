@@ -69,6 +69,7 @@ def train(
     optimizer,
     num_epochs=1000,
     device=None,
+    path=None,
 ):
     epoch_loss, epoch_acc, epoch_top1, epoch_f1, epoch_test_top1, epoch_test_f1 = (
         [],
@@ -99,6 +100,9 @@ def train(
 
         if loss < 1e-5:
             break
+
+        if epoch % 100 == 99:
+            torch.save(model.state_dict(), f"{path}_{epoch}steps_params.pt")
 
     hist_dict = {
         "Iterations": range(epoch + 1),

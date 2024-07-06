@@ -26,7 +26,7 @@ if __name__ == "__main__":
         [
             transforms.RandomCrop(32, padding=4, padding_mode="reflect"),
             transforms.RandomHorizontalFlip(),
-            transforms.RandomRotation(15),
+            # transforms.RandomRotation(15),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]
@@ -65,11 +65,12 @@ if __name__ == "__main__":
         num_classes,
         criterion,
         optimizer,
-        num_epochs=200,
+        num_epochs=1000,
         device=device,
+        path="./models/vgg16_cifar10_adam",
     )
 
-    torch.save(model.state_dict(), "./models/vgg16_cifar10_adam_200steps_params.pt")
+    torch.save(model.state_dict(), "./models/vgg16_cifar10_adam_1000steps_params.pt")
 
     df = pd.DataFrame(hist_dict)
-    df.to_csv("./out/vgg16_cifar10_adam_200steps_hist.csv")
+    df.to_csv("./out/vgg16_cifar10_adam_1000steps_hist.csv")
