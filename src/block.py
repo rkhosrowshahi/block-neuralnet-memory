@@ -101,7 +101,7 @@ class MultiObjOptimalBlockOptimzationProblem(Problem):
 
         return histogram_block_codebook
 
-    def _merge_till_noimprv(self, histogram_block_codebook, best_f):
+    def _merge_till_noimprv(self, histogram_block_codebook, best_f, B_max):
 
         new_dims = len(histogram_block_codebook)
         codebook = histogram_block_codebook.copy()
@@ -155,10 +155,10 @@ class MultiObjOptimalBlockOptimzationProblem(Problem):
                 device=self.device,
             )
 
-            # print(
-            #     f"B_max:{B_max}, current B_opt:{len(right_mrg_codebook)}, D_i:{i}/{new_dims}",
-            #     f" | curr best f1: {best_f:.9f}, L f1: {left_f:.9f}, R f1: {right_f:.9f}"
-            # )
+            print(
+                f"B_max:{B_max}, current B_opt:{len(right_mrg_codebook)}, D_i:{i}/{new_dims}",
+                f" | curr best f1: {best_f:.9f}, L f1: {left_f:.9f}, R f1: {right_f:.9f}",
+            )
 
             argmax_f = np.argmin([left_f, right_f, best_f])
             if argmax_f == 0:
@@ -209,6 +209,7 @@ class MultiObjOptimalBlockOptimzationProblem(Problem):
                 data_loader=self.test_loader,
                 num_classes=self.num_classes,
                 device=self.device,
+                mode="test",
             )
 
             x_path = f"{self.hist_file_path}/codebooks/codebook_bmax_{B_max}.pkl"
@@ -221,7 +222,7 @@ class MultiObjOptimalBlockOptimzationProblem(Problem):
 
             else:
                 xopt_codebook, xopt_f = self._merge_till_noimprv(
-                    xhist_codebook, xhist_f
+                    xhist_codebook, xhist_f, B_max
                 )
 
             un_params = self.unblocker(
@@ -241,6 +242,7 @@ class MultiObjOptimalBlockOptimzationProblem(Problem):
                 data_loader=self.test_loader,
                 num_classes=self.num_classes,
                 device=self.device,
+                mode="test",
             )
 
             B_opt = len(xopt_codebook)
