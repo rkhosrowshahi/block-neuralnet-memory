@@ -48,7 +48,7 @@ if __name__ == "__main__":
     val_loader = DataLoader(testset, batch_size=256, shuffle=False)
     test_loader = DataLoader(testset, batch_size=10000, shuffle=False)
 
-    model = vgg16(num_classes=num_classes, weights="IMAGENET1K_FEATURES")
+    model = vgg16(num_classes=num_classes)
     problem_name = "vgg16"
     model.to(device)
 
@@ -67,10 +67,12 @@ if __name__ == "__main__":
         optimizer,
         num_epochs=1000,
         device=device,
-        path="./models/vgg16_cifar10_adam",
+        path=f"./models/{problem_name}_cifar10_adam",
     )
 
-    torch.save(model.state_dict(), "./models/vgg16_cifar10_adam_1000steps_params.pt")
+    torch.save(
+        model.state_dict(), f"./models/{problem_name}_cifar10_adam_1000steps_params.pt"
+    )
 
     df = pd.DataFrame(hist_dict)
-    df.to_csv("./out/vgg16_cifar10_adam_1000steps_hist.csv")
+    df.to_csv(f"./out/{problem_name}_cifar10_adam_1000steps_hist.csv")

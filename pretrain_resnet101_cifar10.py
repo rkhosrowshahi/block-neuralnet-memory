@@ -5,7 +5,7 @@ import torch
 from torch.utils.data import DataLoader
 import torchvision
 import torchvision.transforms as transforms
-from torchvision.models import resnet18
+from torchvision.models import resnet101
 
 from src.traingb import train
 
@@ -48,8 +48,8 @@ if __name__ == "__main__":
     val_loader = DataLoader(testset, batch_size=256, shuffle=False)
     test_loader = DataLoader(testset, batch_size=10000, shuffle=False)
 
-    model = resnet18(num_classes=num_classes)
-    problem_name = "resnet18"
+    model = resnet101(num_classes=num_classes)
+    problem_name = "resnet101"
     model.to(device)
 
     criterion = torch.nn.CrossEntropyLoss()

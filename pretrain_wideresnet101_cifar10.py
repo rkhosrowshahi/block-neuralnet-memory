@@ -49,7 +49,7 @@ if __name__ == "__main__":
     test_loader = DataLoader(testset, batch_size=10000, shuffle=False)
 
     model = wide_resnet101_2(num_classes=num_classes)
-    problem_name = "wresnet"
+    problem_name = "wideresnet101"
     model.to(device)
 
     criterion = torch.nn.CrossEntropyLoss()
@@ -67,12 +67,12 @@ if __name__ == "__main__":
         optimizer,
         num_epochs=1000,
         device=device,
-        path="./models/wideresnet101_cifar10_adam",
+        path=f"./models/{problem_name}_cifar10_adam",
     )
 
     torch.save(
-        model.state_dict(), "./models/wideresnet101_cifar10_adam_1000steps_params.pt"
+        model.state_dict(), f"./models/{problem_name}_cifar10_adam_1000steps_params.pt"
     )
 
     df = pd.DataFrame(hist_dict)
-    df.to_csv("./out/wideresnet101_cifar10_adam_1000steps_hist.csv")
+    df.to_csv(f"./out/{problem_name}_cifar10_adam_1000steps_hist.csv")
