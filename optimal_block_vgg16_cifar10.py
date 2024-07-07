@@ -106,7 +106,7 @@ if __name__ == "__main__":
 
     # init_pop = np.column_stack([np.random.randint(16, 512, size=100) for k in range(1)])
     init_pop = np.column_stack(
-        [np.linspace(8, 512 - 1, 100, dtype=int) for k in range(1)]
+        [np.linspace(128, 512 - 1, 100, dtype=int) for k in range(1)]
     )
 
     algorithm = NSGA2(pop_size=100, sampling=init_pop, eliminate_duplicates=True)
