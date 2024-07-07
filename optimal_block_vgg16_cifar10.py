@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import DataLoader, Subset
 import torchvision
 import torchvision.transforms as transforms
-from torchvision.models import resnet18
+from torchvision.models import vgg16
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -66,8 +66,8 @@ if __name__ == "__main__":
     val_loader = DataLoader(balanced_dataset, batch_size=num_samples, shuffle=False)
     test_loader = DataLoader(testset, batch_size=10000, shuffle=False)
 
-    model = resnet18(num_classes=num_classes)
-    problem_name = "ResNet18"
+    model = vgg16(num_classes=num_classes)
+    problem_name = "vgg16"
     model.to(device)
 
     model.load_state_dict(torch.load("./models/vgg16_cifar10_adam_200steps_params.pt"))
