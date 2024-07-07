@@ -16,7 +16,7 @@ from pymoo.optimize import minimize
 
 
 if __name__ == "__main__":
-    os.makedirs("./out/nsga2_resnet18_cifar10_100steps/codebooks", exist_ok=True)
+    os.makedirs("./out/nsga2_vgg16_cifar10_200steps/codebooks", exist_ok=True)
 
     seed = 1
     torch.manual_seed(seed)
@@ -70,9 +70,7 @@ if __name__ == "__main__":
     problem_name = "ResNet18"
     model.to(device)
 
-    model.load_state_dict(
-        torch.load("./models/resnet18_cifar10_adam_100steps_params.pt")
-    )
+    model.load_state_dict(torch.load("./models/vgg16_cifar10_adam_200steps_params.pt"))
 
     params = get_model_params(model)
 
@@ -81,7 +79,7 @@ if __name__ == "__main__":
     gb_f = f1score_func(model, val_loader, num_classes, device)
     gb_test_f = f1score_func(model, test_loader, num_classes, device)
 
-    hist_file_path = f"./out/nsga2_resnet18_cifar10_100steps"
+    hist_file_path = f"./out/nsga2_vgg16_cifar10_200steps"
 
     df = pd.DataFrame(
         {
@@ -106,7 +104,10 @@ if __name__ == "__main__":
         hist_file_path=hist_file_path,
     )
 
-    init_pop = np.column_stack([np.random.randint(16, 256, size=100) for k in range(1)])
+    # init_pop = np.column_stack([np.random.randint(16, 512, size=100) for k in range(1)])
+    init_pop = np.column_stack(
+        [np.linspace(8, 512 - 1, 100, dtype=int) for k in range(1)]
+    )
 
     algorithm = NSGA2(pop_size=100, sampling=init_pop, eliminate_duplicates=True)
 
@@ -128,7 +129,7 @@ if __name__ == "__main__":
         }
     )
 
-    df.to_csv("./out/nsga2_resnet18_cifar10_100steps/paretofront.csv", index=False)
+    df.to_csv("./out/nsga2_vgg16_cifar10_200steps/paretofront.csv", index=False)
 
     plt.axhline(y=1 - gb_f, color="r", linestyle="-.", label="Baseline")
     plt.plot(
@@ -144,4 +145,4 @@ if __name__ == "__main__":
     plt.ylabel("Optimal blocked F1-score")
     plt.legend()
 
-    plt.savefig("./out/nsga2_resnet18_cifar10_100steps/paretofront.pdf")
+    plt.savefig("./out/nsga2_vgg16_cifar10_200steps/paretofront.pdf")
