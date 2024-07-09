@@ -47,8 +47,8 @@ class MultiObjOptimalBlockOptimzationProblem(Problem):
     def __init__(
         self,
         n_var=1,
-        xl=10,
-        xu=256,
+        xl=2,
+        xu=1024,
         params=None,
         model=None,
         evaluation=None,
@@ -182,11 +182,13 @@ class MultiObjOptimalBlockOptimzationProblem(Problem):
         f2 = np.zeros(NP)
         for si, B_max in enumerate(X):
             B_max = int(B_max[0])
-            if B_max in self.dataframe["B_max"]:
+            if sum(self.dataframe["B_max"] == B_max) > 0:
                 results = self.dataframe.loc[self.dataframe["B_max"] == B_max]
+                print(results)
 
-                f1[si] = results["B_opt_f1"]
-                f2[si] = results["B_opt"]
+                f1[si] = float(results["B_opt_f1"].iloc[0])
+
+                f2[si] = float(results["B_opt"].iloc[0])
                 continue
 
             xhist_codebook = self._hist_block(B_max)

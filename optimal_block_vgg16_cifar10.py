@@ -16,7 +16,8 @@ from pymoo.optimize import minimize
 
 
 if __name__ == "__main__":
-    os.makedirs("./out/nsga2_vgg16_cifar10_200steps/codebooks", exist_ok=True)
+    problem_title = "nsga2_vgg16_cifar10_200steps"
+    os.makedirs(f"./out/{problem_title}/codebooks", exist_ok=True)
 
     seed = 1
     torch.manual_seed(seed)
@@ -76,24 +77,29 @@ if __name__ == "__main__":
 
     orig_dims = len(params)
 
-    gb_f = f1score_func(model, val_loader, num_classes, device)
-    gb_test_f = f1score_func(model, test_loader, num_classes, device)
+    hist_file_path = f"./out/{problem_title}"
 
-    hist_file_path = f"./out/nsga2_vgg16_cifar10_200steps"
-
-    df = pd.DataFrame(
-        {
-            "B_max": [len(params)],
-            "B_max_f1": [gb_f],
-            "B_max_test_f1": [gb_test_f],
-            "B_opt": [len(params)],
-            "B_opt_f1": [gb_f],
-            "B_opt_test_f1": [gb_test_f],
-        }
-    )
-    df.to_csv(hist_file_path + "/hist_table.csv", index=False)
+    df = None
+    if os.path.exists(hist_file_path + "/hist_table.csv"):
+        df = pd.read_csv(hist_file_path + "/hist_table.csv")
+    else:
+        gb_f = f1score_func(model, val_loader, num_classes, device)
+        gb_test_f = f1score_func(model, test_loader, num_classes, device, mode="test")
+        df = pd.DataFrame(
+            {
+                "B_max": [len(params)],
+                "B_max_f1": [gb_f],
+                "B_max_test_f1": [gb_test_f],
+                "B_opt": [len(params)],
+                "B_opt_f1": [gb_f],
+                "B_opt_test_f1": [gb_test_f],
+            }
+        )
+        df.to_csv(hist_file_path + "/hist_table.csv", index=False)
 
     problem = MultiObjOptimalBlockOptimzationProblem(
+        xl=64,
+        xu=256 - 1,
         params=params,
         model=model,
         evaluation=f1score_func,
@@ -104,37 +110,47 @@ if __name__ == "__main__":
         hist_file_path=hist_file_path,
     )
 
-    # init_pop = np.column_stack([np.random.randint(16, 512, size=100) for k in range(1)])
-    init_pop = np.column_stack(
-        [np.linspace(64, 512 - 1, 100, dtype=int) for k in range(1)]
+    init_pop = np.random.choice(
+        np.linspace(problem.xl[0], problem.xu[0], 10, dtype=int), size=10, replace=True
     )
+    init_pop.sort()
+    print(init_pop)
+    init_pop = init_pop.reshape(-1, 1)
 
-    algorithm = NSGA2(pop_size=100, sampling=init_pop, eliminate_duplicates=True)
+    algorithm = NSGA2(pop_size=10, sampling=init_pop, eliminate_duplicates=True)
 
     res = minimize(
         problem,
         algorithm,
-        ("n_gen", 3),
+        ("n_gen", 5),
         seed=1,
         verbose=True,
     )
 
     arg_sorted = np.argsort(res.F[:, 1])
 
-    df = pd.DataFrame(
-        {
-            "B_max": res.X[arg_sorted, 0].astype(int),
-            "B_opt": res.F[arg_sorted, 1],
-            "B_opt F1 err": res.F[arg_sorted, 0],
-        }
+    plt.axhline(
+        y=1 - df.iloc[0]["B_opt_f1"], color="r", linestyle="-.", label="Baseline"
     )
 
-    df.to_csv("./out/nsga2_vgg16_cifar10_200steps/paretofront.csv", index=False)
+    df = None
+    if os.path.exists(f"./out/{problem_title}/paretofront.csv"):
 
-    plt.axhline(y=1 - gb_f, color="r", linestyle="-.", label="Baseline")
+        df = pd.read_csv(f"./out/{problem_title}/paretofront.csv")
+    else:
+        df = pd.DataFrame(
+            {
+                "B_max": res.X[arg_sorted, 0].astype(int),
+                "B_opt": res.F[arg_sorted, 1],
+                "B_opt_f1": res.F[arg_sorted, 0],
+            }
+        )
+
+        df.to_csv(f"./out/{problem_title}/paretofront.csv", index=False)
+
     plt.plot(
         df["B_opt"].to_numpy(),
-        1 - df["B_opt F1 err"].to_numpy(),
+        1 - df["B_opt_f1"].to_numpy(),
         label="Pareto Frontier",
         marker="o",
         linestyle="--",
@@ -142,7 +158,7 @@ if __name__ == "__main__":
 
     plt.grid()
     plt.xlabel("Optimal blocked dimensions")
-    plt.ylabel("Optimal blocked F1-score")
+    plt.ylabel("Validation F1-score")
     plt.legend()
 
-    plt.savefig("./out/nsga2_vgg16_cifar10_200steps/paretofront.pdf")
+    plt.savefig(f"./out/{problem_title }/paretofront.pdf")
