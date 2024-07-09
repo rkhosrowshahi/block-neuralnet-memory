@@ -110,9 +110,7 @@ if __name__ == "__main__":
         hist_file_path=hist_file_path,
     )
 
-    init_pop = np.random.choice(
-        np.linspace(problem.xl[0], problem.xu[0], 10, dtype=int), size=10, replace=True
-    )
+    init_pop = np.linspace(problem.xl[0], problem.xu[0], 10, dtype=int)
     init_pop.sort()
     print(init_pop)
     init_pop = init_pop.reshape(-1, 1)
