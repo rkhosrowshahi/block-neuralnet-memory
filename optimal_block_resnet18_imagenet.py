@@ -124,13 +124,13 @@ if __name__ == "__main__":
     )
 
     init_pop = np.random.choice(
-        np.linspace(problem.xl[0], problem.xu[0], 100, dtype=int), size=10, replace=True
+        np.linspace(problem.xl[0], problem.xu[0], 100, dtype=int), size=20, replace=True
     )
     init_pop.sort()
     print(init_pop)
     init_pop = init_pop.reshape(-1, 1)
 
-    algorithm = NSGA2(pop_size=10, sampling=init_pop, eliminate_duplicates=True)
+    algorithm = NSGA2(pop_size=20, sampling=init_pop, eliminate_duplicates=True)
 
     res = minimize(
         problem,

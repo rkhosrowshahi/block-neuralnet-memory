@@ -14,7 +14,7 @@ if __name__ == "__main__":
     os.makedirs("./models", exist_ok=True)
     os.makedirs("./out", exist_ok=True)
 
-    seed = 1
+    seed = 2
     torch.manual_seed(seed)
     np.random.seed(seed=seed)
 
@@ -24,9 +24,8 @@ if __name__ == "__main__":
 
     transform_train = transforms.Compose(
         [
-            transforms.RandomCrop(32, padding=4, padding_mode="reflect"),
+            transforms.RandomCrop(32, padding=4),
             transforms.RandomHorizontalFlip(),
-            transforms.RandomRotation(15),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]
@@ -44,8 +43,8 @@ if __name__ == "__main__":
         root="./data", train=False, download=True, transform=transform_test
     )
 
-    train_loader = DataLoader(trainset, batch_size=256, shuffle=True)
-    val_loader = DataLoader(testset, batch_size=256, shuffle=False)
+    train_loader = DataLoader(trainset, batch_size=128, shuffle=True)
+    val_loader = DataLoader(testset, batch_size=128, shuffle=False)
     test_loader = DataLoader(testset, batch_size=10000, shuffle=False)
 
     model = resnet18(num_classes=num_classes)
@@ -65,14 +64,15 @@ if __name__ == "__main__":
         num_classes,
         criterion,
         optimizer,
-        num_epochs=200,
+        num_epochs=100,
         device=device,
-        path=f"./models/{problem_name}_cifar10_adam",
+        path=f"./models/{problem_name}_cifar10_adam_seed2",
     )
 
     torch.save(
-        model.state_dict(), f"./models/{problem_name}_cifar10_adam_1000steps_params.pt"
+        model.state_dict(),
+        f"./models/{problem_name}_cifar10_adam_100steps_seed2_params.pt",
     )
 
     df = pd.DataFrame(hist_dict)
-    df.to_csv(f"./out/{problem_name}_cifar10_adam_1000steps_hist.csv")
+    df.to_csv(f"./out/{problem_name}_cifar10_adam_100steps_seed2_hist.csv")

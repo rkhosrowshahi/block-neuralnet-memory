@@ -35,7 +35,7 @@ plt.style.use(["science", "ieee", "no-latex"])
 
 
 if __name__ == "__main__":
-    problem_title = "nsga2_resnet18_cifar100_100steps"
+    problem_title = "nsga2_resnet18_cifar100_100steps_1000data_widerange"
     os.makedirs(f"./out/{problem_title}/codebooks", exist_ok=True)
 
     seed = 1
@@ -125,7 +125,7 @@ if __name__ == "__main__":
 
     problem = MultiObjOptimalBlockOptimzationProblem(
         xl=8,
-        xu=256 - 1,
+        xu=1024 - 1,
         params=params,
         model=model,
         evaluation=f1score_func,
@@ -136,12 +136,12 @@ if __name__ == "__main__":
         hist_file_path=hist_file_path,
     )
 
-    init_pop = np.linspace(problem.xl[0], problem.xu[0], 100, dtype=int)
+    init_pop = np.linspace(problem.xl[0], problem.xu[0], 20, dtype=int)
     init_pop.sort()
     print(init_pop)
     init_pop = init_pop.reshape(-1, 1)
 
-    algorithm = NSGA2(pop_size=100, sampling=init_pop, eliminate_duplicates=True)
+    algorithm = NSGA2(pop_size=20, sampling=init_pop, eliminate_duplicates=True)
 
     res = minimize(
         problem,
