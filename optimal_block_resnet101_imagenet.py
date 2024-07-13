@@ -111,8 +111,8 @@ if __name__ == "__main__":
         df.to_csv(hist_file_path + "/hist_table.csv", index=False)
 
     problem = MultiObjOptimalBlockOptimzationProblem(
-        xl=128,
-        xu=1024 - 1,
+        xl=1024,
+        xu=2048 - 1,
         params=params,
         model=model,
         evaluation=f1score_func,
@@ -123,9 +123,7 @@ if __name__ == "__main__":
         hist_file_path=hist_file_path,
     )
 
-    init_pop = np.random.choice(
-        np.linspace(problem.xl[0], problem.xu[0], 100, dtype=int), size=10, replace=True
-    )
+    init_pop = np.linspace(problem.xl[0], problem.xu[0], 10, dtype=int)
     init_pop.sort()
     print(init_pop)
     init_pop = init_pop.reshape(-1, 1)
