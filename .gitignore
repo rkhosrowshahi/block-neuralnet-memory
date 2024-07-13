@@ -2,3 +2,5 @@
 data/
 *.pkl
 __pycache__/
+models/
+out/
