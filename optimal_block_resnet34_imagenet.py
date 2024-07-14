@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import DataLoader, Subset
 import torchvision
 import torchvision.transforms as transforms
-from torchvision.models import resnet101
+from torchvision.models import resnet34
 import pandas as pd
 from src.block import MultiObjOptimalBlockOptimzationProblem
 from src.utils import f1score_func, get_model_params
@@ -18,7 +18,7 @@ import scienceplots
 plt.style.use(["science", "ieee", "no-latex"])
 
 if __name__ == "__main__":
-    problem_title = "nsga2_resnet101_imagenet"
+    problem_title = "nsga2_resnet34_imagenet"
     os.makedirs(f"./out/{problem_title}/codebooks", exist_ok=True)
 
     seed = 1
@@ -82,8 +82,8 @@ if __name__ == "__main__":
     test_loader = DataLoader(balanced_dataset_test, batch_size=1024, shuffle=False)
     print(len(test_loader))
 
-    model = resnet101(weights="DEFAULT")
-    problem_name = "ResNet101"
+    model = resnet34(weights="DEFAULT")
+    problem_name = "resnet34"
     model.to(device)
 
     params = get_model_params(model)
@@ -111,7 +111,7 @@ if __name__ == "__main__":
         df.to_csv(hist_file_path + "/hist_table.csv", index=False)
 
     problem = MultiObjOptimalBlockOptimzationProblem(
-        xl=10001,
+        xl=5001,
         xu=20000 - 1,
         params=params,
         model=model,

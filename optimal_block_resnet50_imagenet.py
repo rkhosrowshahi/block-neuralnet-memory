@@ -111,8 +111,8 @@ if __name__ == "__main__":
         df.to_csv(hist_file_path + "/hist_table.csv", index=False)
 
     problem = MultiObjOptimalBlockOptimzationProblem(
-        xl=1024,
-        xu=2048 - 1,
+        xl=10001,
+        xu=20000 - 1,
         params=params,
         model=model,
         evaluation=f1score_func,
@@ -121,6 +121,7 @@ if __name__ == "__main__":
         num_classes=num_classes,
         device=device,
         hist_file_path=hist_file_path,
+        merge=False,
     )
 
     init_pop = init_pop = np.linspace(problem.xl[0], problem.xu[0], 10, dtype=int)

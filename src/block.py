@@ -57,6 +57,7 @@ class MultiObjOptimalBlockOptimzationProblem(Problem):
         num_classes=None,
         device=None,
         hist_file_path=None,
+        merge=True,
     ):
         super().__init__(
             n_var=n_var,
@@ -78,6 +79,7 @@ class MultiObjOptimalBlockOptimzationProblem(Problem):
         self.device = device
         self.hist_file_path = hist_file_path
         self.dataframe = pd.read_csv(hist_file_path + "/hist_table.csv")
+        self.merge = merge
 
     def _calc_pareto_front(self, n_pareto_points=100):
         x = np.linspace(0, 1, n_pareto_points)
@@ -222,30 +224,35 @@ class MultiObjOptimalBlockOptimzationProblem(Problem):
                 ) as f:
                     xopt_codebook = pickle.load(f)
 
-            else:
+            elif self.merge == True:
                 xopt_codebook, xopt_f = self._merge_till_noimprv(
                     xhist_codebook, xhist_f, B_max
                 )
 
-            un_params = self.unblocker(
-                xopt_codebook,
-                self.orig_dims,
-                blocked_params=self.blocker(self.params, xopt_codebook),
-            )
-            model = set_model_state(model=self.model, parameters=un_params)
-            xopt_f = self.evaluation(
-                model,
-                data_loader=self.data_loader,
-                num_classes=self.num_classes,
-                device=self.device,
-            )
-            xopt_test_f = self.evaluation(
-                model,
-                data_loader=self.test_loader,
-                num_classes=self.num_classes,
-                device=self.device,
-                mode="test",
-            )
+                un_params = self.unblocker(
+                    xopt_codebook,
+                    self.orig_dims,
+                    blocked_params=self.blocker(self.params, xopt_codebook),
+                )
+                model = set_model_state(model=self.model, parameters=un_params)
+                xopt_f = self.evaluation(
+                    model,
+                    data_loader=self.data_loader,
+                    num_classes=self.num_classes,
+                    device=self.device,
+                )
+                xopt_test_f = self.evaluation(
+                    model,
+                    data_loader=self.test_loader,
+                    num_classes=self.num_classes,
+                    device=self.device,
+                    mode="test",
+                )
+            else:
+                xopt_codebook = xhist_codebook
+
+                xopt_f = xhist_f
+                xopt_test_f = xhist_test_f
 
             B_opt = len(xopt_codebook)
             f1[si] = xopt_f
@@ -261,6 +268,7 @@ class MultiObjOptimalBlockOptimzationProblem(Problem):
                     "B_opt_test_f1": [xopt_test_f],
                 }
             )
+            print(new_row)
             self.dataframe = pd.concat([self.dataframe, new_row])
             # print(self.dataframe)
             self.dataframe.to_csv(self.hist_file_path + "/hist_table.csv", index=False)
