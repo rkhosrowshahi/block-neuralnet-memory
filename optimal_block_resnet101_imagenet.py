@@ -57,7 +57,7 @@ if __name__ == "__main__":
     )
     print(len(testset))
     # train_loader = DataLoader(trainset, batch_size=256, shuffle=True)
-    num_samples, num_samples_test = 1000, 10000
+    num_samples, num_samples_test = 2000, 10000
     samples_per_class = num_samples // num_classes
     if num_samples % num_classes > 0:
         samples_per_class += 1
