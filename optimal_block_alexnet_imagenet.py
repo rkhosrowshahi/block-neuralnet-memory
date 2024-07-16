@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import DataLoader, Subset
 import torchvision
 import torchvision.transforms as transforms
-from torchvision.models import resnet34
+from torchvision.models import alexnet
 import pandas as pd
 from src.block import MultiObjOptimalBlockOptimzationProblem
 from src.utils import f1score_func, get_model_params
@@ -18,7 +18,7 @@ import scienceplots
 plt.style.use(["science", "ieee", "no-latex"])
 
 if __name__ == "__main__":
-    problem_title = "nsga2_resnet34_imagenet"
+    problem_title = "nsga2_alexnet_imagenet"
     os.makedirs(f"./out/{problem_title}/codebooks", exist_ok=True)
 
     seed = 1
@@ -82,8 +82,8 @@ if __name__ == "__main__":
     test_loader = DataLoader(balanced_dataset_test, batch_size=1024, shuffle=False)
     print(len(test_loader))
 
-    model = resnet34(weights="DEFAULT")
-    problem_name = "resnet34"
+    model = alexnet(weights="DEFAULT")
+    problem_name = "alexnet"
     model.to(device)
 
     params = get_model_params(model)
@@ -111,8 +111,8 @@ if __name__ == "__main__":
         df.to_csv(hist_file_path + "/hist_table.csv", index=False)
 
     problem = MultiObjOptimalBlockOptimzationProblem(
-        xl=100,
-        xu=2000 - 1,
+        xl=128,
+        xu=2048 - 1,
         params=params,
         model=model,
         evaluation=f1score_func,
@@ -124,12 +124,12 @@ if __name__ == "__main__":
         merge=False,
     )
 
-    init_pop = np.linspace(problem.xl[0], problem.xu[0], 10, dtype=int)
+    init_pop = init_pop = np.linspace(problem.xl[0], problem.xu[0], 100, dtype=int)
     init_pop.sort()
     print(init_pop)
     init_pop = init_pop.reshape(-1, 1)
 
-    algorithm = NSGA2(pop_size=10, sampling=init_pop, eliminate_duplicates=True)
+    algorithm = NSGA2(pop_size=100, sampling=init_pop, eliminate_duplicates=True)
 
     res = minimize(
         problem,
