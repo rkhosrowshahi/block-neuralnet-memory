@@ -43,7 +43,7 @@ def blocker(params, codebook):
 #     return unblocked_params
 
 
-def unblocker(codebook, blocked_params, orig_dims):
+def unblocker(codebook, orig_dims, blocked_params):
 
     unblocked_params = np.zeros(orig_dims)
     # start_time = time.time()
