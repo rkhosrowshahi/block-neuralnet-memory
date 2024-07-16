@@ -106,16 +106,29 @@ class MultiObjOptimalBlockOptimzationProblem(Problem):
         # Split the data into bins
         binned_data = np.digitize(self.params, bin_edges)
 
+        blocks_arrs = [np.array([])] * B_max
+        for i in range(self.orig_dims):
+            blocks_arrs[binned_data[i]] = np.concatenate(
+                [blocks_arrs[binned_data[i]], [self.params[i]]]
+            )
+
         histogram_block_codebook = {}
         histogram_block_codebook_size = {}
         nonempty_bins_i = 0
 
         for i in range(B_max):
-            b_i = np.where(binned_data == i)[0]
-            if len(b_i) != 0:
-                histogram_block_codebook[nonempty_bins_i] = (b_i).tolist()
-                histogram_block_codebook_size[i] = len(b_i)
+            if len(blocks_arrs[i]) != 0:
+
+                histogram_block_codebook[nonempty_bins_i] = blocks_arrs[i].tolist()
+                histogram_block_codebook_size[i] = len(blocks_arrs[i])
                 nonempty_bins_i += 1
+
+        # for i in range(B_max):
+        #     b_i = np.where(binned_data == i)[0]
+        #     if len(b_i) != 0:
+        #         histogram_block_codebook[nonempty_bins_i] = (b_i).tolist()
+        #         histogram_block_codebook_size[i] = len(b_i)
+        #         nonempty_bins_i += 1
 
         return histogram_block_codebook
 
