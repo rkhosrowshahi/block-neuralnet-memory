@@ -15,31 +15,47 @@ def blocker(params, codebook):
     return np.array(blocked_params)
 
 
-from concurrent.futures import ThreadPoolExecutor
+# from concurrent.futures import ThreadPoolExecutor
 
 
-def update_unblocked_params(block_idx, indices, unblocked_params, blocked_params):
-    unblocked_params[indices] = np.full(len(indices), blocked_params[block_idx])
+# def update_unblocked_params(block_idx, indices, unblocked_params, blocked_params):
+#     unblocked_params[indices] = np.full(len(indices), blocked_params[block_idx])
 
 
-def unblocker(codebook, orig_dims, blocked_params):
+# def unblocker_mp(codebook, orig_dims, blocked_params):
+#     unblocked_params = np.zeros(orig_dims)
+#     with ThreadPoolExecutor() as executor:
+#         futures = []
+#         for block_idx, indices in codebook.items():
+#             futures.append(
+#                 executor.submit(
+#                     update_unblocked_params,
+#                     block_idx,
+#                     indices,
+#                     unblocked_params,
+#                     blocked_params,
+#                 )
+#             )
+
+#         for future in futures:
+#             future.result()  # Wait for all futures to complete
+
+#     return unblocked_params
+
+
+def unblocker(codebook, blocked_params, orig_dims):
+
     unblocked_params = np.zeros(orig_dims)
-    with ThreadPoolExecutor() as executor:
-        futures = []
-        for block_idx, indices in codebook.items():
-            futures.append(
-                executor.submit(
-                    update_unblocked_params,
-                    block_idx,
-                    indices,
-                    unblocked_params,
-                    blocked_params,
-                )
-            )
+    # start_time = time.time()
+    for block_idx, indices in codebook.items():
+        # st_in = time.time()
+        unblocked_params[indices] = np.full(len(indices), blocked_params[block_idx])
+        # tot_in = time.time() - st_in
+        # print(tot_in)
 
-        for future in futures:
-            future.result()  # Wait for all futures to complete
+    # end_time = time.time() - start_time
 
+    # print(end_time)
     return unblocked_params
 
 

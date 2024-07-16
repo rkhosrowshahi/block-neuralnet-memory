@@ -18,7 +18,7 @@ import scienceplots
 plt.style.use(["science", "ieee", "no-latex"])
 
 if __name__ == "__main__":
-    problem_title = "nsga2_alexnet_imagenet"
+    problem_title = "nsga2_alexnet_imagenet_5000data"
     os.makedirs(f"./out/{problem_title}/codebooks", exist_ok=True)
 
     seed = 1
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     )
     print(len(testset))
     # train_loader = DataLoader(trainset, batch_size=256, shuffle=True)
-    num_samples, num_samples_test = 2000, 10000
+    num_samples, num_samples_test = 5000, 10000
     samples_per_class = num_samples // num_classes
     if num_samples % num_classes > 0:
         samples_per_class += 1
@@ -111,8 +111,8 @@ if __name__ == "__main__":
         df.to_csv(hist_file_path + "/hist_table.csv", index=False)
 
     problem = MultiObjOptimalBlockOptimzationProblem(
-        xl=128,
-        xu=2048 - 1,
+        xl=100,
+        xu=2000 - 1,
         params=params,
         model=model,
         evaluation=f1score_func,
