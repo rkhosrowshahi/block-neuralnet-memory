@@ -57,7 +57,7 @@ if __name__ == "__main__":
     )
     print(len(testset))
     # train_loader = DataLoader(trainset, batch_size=256, shuffle=True)
-    num_samples, num_samples_test = 2000, 10000
+    num_samples, num_samples_test = 5000, 10000
     samples_per_class = num_samples // num_classes
     if num_samples % num_classes > 0:
         samples_per_class += 1
@@ -124,12 +124,12 @@ if __name__ == "__main__":
         merge=False,
     )
 
-    init_pop = np.linspace(problem.xl[0], problem.xu[0], 10, dtype=int)
+    init_pop = np.linspace(problem.xl[0], problem.xu[0], 100, dtype=int)
     init_pop.sort()
     print(init_pop)
     init_pop = init_pop.reshape(-1, 1)
 
-    algorithm = NSGA2(pop_size=10, sampling=init_pop, eliminate_duplicates=True)
+    algorithm = NSGA2(pop_size=100, sampling=init_pop, eliminate_duplicates=True)
 
     res = minimize(
         problem,

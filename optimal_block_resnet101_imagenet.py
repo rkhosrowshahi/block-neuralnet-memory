@@ -111,7 +111,7 @@ if __name__ == "__main__":
         df.to_csv(hist_file_path + "/hist_table.csv", index=False)
 
     problem = MultiObjOptimalBlockOptimzationProblem(
-        xl=500001,
+        xl=100,
         xu=2000000 - 1,
         params=params,
         model=model,
