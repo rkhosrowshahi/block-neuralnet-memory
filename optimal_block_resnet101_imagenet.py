@@ -57,7 +57,7 @@ if __name__ == "__main__":
     )
     print(len(testset))
     # train_loader = DataLoader(trainset, batch_size=256, shuffle=True)
-    num_samples, num_samples_test = 2000, 10000
+    num_samples, num_samples_test = 5000, 10000
     samples_per_class = num_samples // num_classes
     if num_samples % num_classes > 0:
         samples_per_class += 1
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     val_loader = DataLoader(balanced_dataset, batch_size=num_samples, shuffle=False)
     print(len(val_loader))
     balanced_dataset_test = Subset(testset, balanced_indices_test)
-    test_loader = DataLoader(balanced_dataset_test, batch_size=1024, shuffle=False)
+    test_loader = DataLoader(balanced_dataset_test, batch_size=5000, shuffle=False)
     print(len(test_loader))
 
     model = resnet101(weights="DEFAULT")
@@ -111,8 +111,8 @@ if __name__ == "__main__":
         df.to_csv(hist_file_path + "/hist_table.csv", index=False)
 
     problem = MultiObjOptimalBlockOptimzationProblem(
-        xl=100,
-        xu=2000000 - 1,
+        xl=100000,
+        xu=200000 - 1,
         params=params,
         model=model,
         evaluation=f1score_func,

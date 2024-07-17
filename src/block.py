@@ -6,6 +6,8 @@ import pandas as pd
 
 from src.utils import set_model_state
 
+from tqdm import tqdm
+
 
 def blocker(params, codebook):
     blocked_params = []
@@ -47,7 +49,9 @@ def unblocker(codebook, orig_dims, blocked_params):
 
     unblocked_params = np.zeros(orig_dims)
     # start_time = time.time()
-    for block_idx, indices in codebook.items():
+    for block_idx, indices in tqdm(
+        codebook.items(), desc=f"Unblocking D= {len(blocked_params)} ==> {orig_dims}"
+    ):
         # st_in = time.time()
         unblocked_params[indices] = np.full(len(indices), blocked_params[block_idx])
         # tot_in = time.time() - st_in
@@ -107,31 +111,29 @@ class MultiObjOptimalBlockOptimzationProblem(Problem):
         binned_data = np.digitize(self.params, bin_edges) - 1
 
         blocks_arrs = [np.array([])] * B_max
-        
-        for i in range(self.orig_dims):
-            if i% 1000000 == 0:
-                print(i, self.orig_dims)
-            blocks_arrs[binned_data[i]] = np.concatenate(
-                [blocks_arrs[binned_data[i]], [self.params[i]]]
-            )
+
+        # for i in tqdm(range(self.orig_dims)):
+        #     # if i % 1000000 == 0:
+        #     #     print(i, self.orig_dims)
+        #     b = binned_data[i]
+        #     blocks_arrs[b] = np.concatenate([blocks_arrs[b], [i]])
 
         histogram_block_codebook = {}
-        #histogram_block_codebook_size = {}
+        # histogram_block_codebook_size = {}
         nonempty_bins_i = 0
 
-        for i in range(B_max):
-            if len(blocks_arrs[i]) != 0:
-
-                histogram_block_codebook[nonempty_bins_i] = blocks_arrs[i].tolist()
-                # histogram_block_codebook_size[i] = len(blocks_arrs[i])
-                nonempty_bins_i += 1
-
         # for i in range(B_max):
-        #     b_i = np.where(binned_data == i)[0]
-        #     if len(b_i) != 0:
-        #         histogram_block_codebook[nonempty_bins_i] = (b_i).tolist()
-        #         histogram_block_codebook_size[i] = len(b_i)
+        #     if len(blocks_arrs[i]) > 0:
+        #         histogram_block_codebook[nonempty_bins_i] = blocks_arrs[i].tolist()
+        #         # histogram_block_codebook_size[i] = len(blocks_arrs[i])
         #         nonempty_bins_i += 1
+
+        for i in tqdm(range(B_max), desc=f"Histogram K={B_max}"):
+            b_i = np.where(binned_data == i)[0]
+            if len(b_i) > 0:
+                histogram_block_codebook[nonempty_bins_i] = (b_i).tolist()
+                # histogram_block_codebook_size[i] = len(b_i)
+                nonempty_bins_i += 1
 
         return histogram_block_codebook
 

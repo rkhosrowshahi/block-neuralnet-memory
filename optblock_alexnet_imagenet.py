@@ -79,7 +79,7 @@ if __name__ == "__main__":
     val_loader = DataLoader(balanced_dataset, batch_size=num_samples, shuffle=False)
     print(len(val_loader))
     balanced_dataset_test = Subset(testset, balanced_indices_test)
-    test_loader = DataLoader(balanced_dataset_test, batch_size=1024, shuffle=False)
+    test_loader = DataLoader(balanced_dataset_test, batch_size=5000, shuffle=False)
     print(len(test_loader))
 
     model = alexnet(weights="DEFAULT")
