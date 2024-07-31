@@ -4,3 +4,5 @@ data/
 __pycache__/
 models/
 out/
+pretrain/
+src/archive/
